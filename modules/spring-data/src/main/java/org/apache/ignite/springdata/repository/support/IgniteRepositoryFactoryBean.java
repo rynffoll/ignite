@@ -22,6 +22,7 @@ import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteException;
 import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.springdata.repository.IgniteRepository;
+import org.apache.ignite.springdata.repository.config.IgniteSpringDataConfiguration;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -64,19 +65,20 @@ public class IgniteRepositoryFactoryBean<T extends Repository<S, ID>, S, ID exte
     /** {@inheritDoc} */
     @Override protected RepositoryFactorySupport createRepositoryFactory() {
         try {
-            Ignite ignite = (Ignite)ctx.getBean("igniteInstance");
+            Ignite ignite = ctx.getBean(Ignite.class);
 
             return new IgniteRepositoryFactory(ignite);
         }
         catch (BeansException ex) {
             try {
-                IgniteConfiguration cfg = (IgniteConfiguration)ctx.getBean("igniteCfg");
+                IgniteConfiguration cfg = ctx.getBean(IgniteConfiguration.class);
 
                 return new IgniteRepositoryFactory(cfg);
             }
             catch (BeansException ex2) {
                 try {
-                    String path = (String)ctx.getBean("igniteSpringCfgPath");
+                    IgniteSpringDataConfiguration igniteSpringDataConfiguration = ctx.getBean(IgniteSpringDataConfiguration.class);
+                    String path = igniteSpringDataConfiguration.getConfigPath();
 
                     return new IgniteRepositoryFactory(path);
                 }
